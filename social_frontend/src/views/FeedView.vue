@@ -15,29 +15,32 @@
     <div class="main-center col-span-2 space-y-4">
       <div class="main-center col-span-2 space-y-4">
         <div class="bg-white border border-gray-200 rounded-lg">
-          <div class="p-4">
-            <textarea
-              class="p-4 w-full bg-gray-100 rounded-lg"
-              placeholder="What are you thinking about?"
-            ></textarea>
-          </div>
+          <form v-on:submit.prevent="submitPost" method="post">
+            <div class="p-4">
+              <textarea
+                v-model="body"
+                class="p-4 w-full bg-gray-100 rounded-lg"
+                placeholder="What are you thinking about?"
+              ></textarea>
+            </div>
 
-          <div class="p-4 border-t border-gray-100 flex justify-between">
-            <a
-              href="#"
-              class="inline-block py-4 px-6 bg-gray-600 text-white rounded-lg"
-              >Attach image</a
-            >
+            <div class="p-4 border-t border-gray-100 flex justify-between">
+              <a
+                class="inline-block py-4 px-6 bg-gray-600 text-white rounded-lg"
+                >Attach image</a
+              >
 
-            <a
-              href="#"
-              class="inline-block py-4 px-6 bg-purple-600 text-white rounded-lg"
-              >Post</a
-            >
-          </div>
+              <button
+                href="#"
+                class="inline-block py-4 px-6 bg-purple-600 text-white rounded-lg"
+              >
+                Post
+              </button>
+            </div>
+          </form>
         </div>
 
-        <div class="p-4 bg-white border border-gray-200 rounded-lg">
+        <!-- <div class="p-4 bg-white border border-gray-200 rounded-lg">
           <div class="mb-6 flex items-center justify-between">
             <div class="flex items-center space-x-6">
               <img
@@ -114,9 +117,13 @@
               </svg>
             </div>
           </div>
-        </div>
+        </div> -->
 
-        <div class="p-4 bg-white border border-gray-200 rounded-lg">
+        <div
+          class="p-4 bg-white border border-gray-200 rounded-lg"
+          v-for="post in posts"
+          v-bind:key="post.id"
+        >
           <div class="mb-6 flex items-center justify-between">
             <div class="flex items-center space-x-6">
               <img
@@ -124,15 +131,16 @@
                 class="w-[40px] rounded-full"
               />
 
-              <p><strong>Written Post / Status</strong></p>
+              <p>
+                <strong>{{ post.created_by.name }}</strong>
+              </p>
             </div>
 
-            <p class="text-gray-600">28 minutes ago</p>
+            <p class="text-gray-600">{{ post.created_by_formatted }}</p>
           </div>
 
           <p>
-            This is just a random text post. This is just a random text post.
-            This is just a random text post. This is just a random text post.
+            {{ post.body }}
           </p>
 
           <div class="my-6 flex justify-between">
@@ -198,7 +206,7 @@
     </div>
     <div class="main-right col-span-1 space-y-4">
       <PeopleYouMayKnow />
-      <Trends/>
+      <Trends />
     </div>
   </div>
 </template>
@@ -206,9 +214,50 @@
 <script>
 import PeopleYouMayKnow from "@/components/peopleYouMayKnow.vue";
 import Trends from "@/components/Trends.vue";
+import axios from "axios";
 
 export default {
   name: "FeedView",
-  components: { PeopleYouMayKnow ,Trends},
+  components: { PeopleYouMayKnow, Trends },
+  data() {
+    return {
+      posts: [],
+      body: "",
+    };
+  },
+  mounted() {
+    this.getFeed();
+  },
+  methods: {
+    getFeed() {
+      axios
+        .get("api/posts/")
+        .then((response) => {
+          console.log("data", response.data);
+
+          this.posts = response.data;
+        })
+        .catch((error) => {
+          console.log("error", error);
+        });
+    },
+
+    submitPost() {
+      console.log("Submit Form ", this.body);
+
+      let context = { body: this.body };
+      axios
+        .post("api/posts/create/", context)
+        .then((response) => {
+          console.log("data", response.data);
+
+          this.posts.unshift(response.data);
+          this.body = "";
+        })
+        .catch((error) => {
+          console.log("error", error);
+        });
+    },
+  },
 };
 </script>
