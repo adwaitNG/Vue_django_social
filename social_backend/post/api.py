@@ -3,7 +3,7 @@ from .forms import PostForm
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from account.models import User
 from account.serializer import UserSerializer
-from .models import Post
+from .models import Post, Like
 from .serializers import PostSerializer
 
 @api_view(['GET'])
@@ -45,4 +45,18 @@ def post_create(request):
     else:
         return JsonResponse({'Error': "Some error during posting"})                    
 
-    return JsonResponse({"BAkc": "Back"})
+@api_view(['POST'])
+def post_like_request(request, id):
+
+    post = Post.objects.get(id=id)
+
+    if not post.likes.filter(created_by=request.user):
+
+        like = Like.objects.create(created_by= request.user)
+
+        post.likes_count = post.likes_count + 1
+        post.likes.add(like)
+        post.save()
+        return JsonResponse({"message": "Like created!!"})
+    else:
+        return JsonResponse({"message":"The post was already liked!"})    

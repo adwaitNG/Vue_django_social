@@ -65,7 +65,7 @@
                   ></path>
                 </svg>
 
-                <span class="text-gray-500 text-xs">82 likes</span>
+                <span class="text-gray-500 text-xs">{{ post.likes_count }} likes</span>
               </div>
 
               <div class="flex items-center space-x-2">
