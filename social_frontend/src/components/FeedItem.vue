@@ -64,7 +64,12 @@
             ></path>
           </svg>
 
-          <span class="text-gray-500 text-xs">3 comments</span>
+          <RouterLink
+            :to="{ name: 'postDetails', params: { id: post.id } }"
+            class="text-gray-500 text-xs"
+          >
+            {{ post.comments_count }} comments</RouterLink
+          >
         </div>
       </div>
 
@@ -89,9 +94,16 @@
 </template>
 <script>
 import axios from "axios";
+import { useToastStore } from "@/stores/toast";
 
 export default {
   name: "FeedItem",
+  setup() {
+    const toastStore = useToastStore();
+    return {
+      toastStore,
+    };
+  },
   props: {
     post: {
       type: Object,
@@ -107,7 +119,13 @@ export default {
           // console.log('data', response.data)
 
           if (response.data.message == "Like created!!") {
-            this.post.likes_count +=1 
+            this.post.likes_count += 1;
+          } else {
+            this.toastStore.showToast(
+              5000,
+              "This post is alredy liked by You!!",
+              "bg-emerald-300"
+            );
           }
         })
         .catch((error) => {
