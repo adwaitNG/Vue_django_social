@@ -93,7 +93,7 @@ export default {
           console.log("data", response.data);
 
           this.post.comments.push(response.data);
-          this.post.comments_count +=1 
+          this.post.comments_count += 1;
           this.body = "";
         })
         .catch((error) => {
