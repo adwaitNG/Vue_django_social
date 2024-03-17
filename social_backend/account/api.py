@@ -1,8 +1,9 @@
 from django.http import JsonResponse
-
+from django.core.mail import send_mail
+from django.contrib.auth.forms import PasswordChangeForm
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 
-from .forms import SingupForm
+from .forms import SingupForm, ProfileForm
 from .models import User, FriendshipRequest
 from .serializer import UserSerializer, FriendshipRequestSerializer
 
@@ -12,7 +13,8 @@ def me(request):
         'id': request.user.id,
         'name': request.user.name,
         'email': request.user.email,
-    })
+        'avatar':request.user.get_avatar(),
+    }, safe=False)
 
 
 @api_view(['POST'])
@@ -31,15 +33,26 @@ def signup(request):
     })
 
     if form.is_valid():
-        form.save()
-        #Verification Email
+        user = form.save()
+        user.is_active = False
+        user.save()
+        url = f'http://127.0.0.1:8000/api/activate-account/?email={user.email}&id={user.id}'
+        
+        message="success"
+        send_mail(
+            "Verify the account",
+            f"The url for activating your account is : {url}",
+            "noreply@gmail.com",
+            [user.email],
+            fail_silently=False
+        )
 
     else:
-        message= 'error'
+        message= form.errors.as_json()
+        
 
-    context = {'message':message}
     
-    return JsonResponse(context)
+    return JsonResponse({'message':message}, safe=False)
 
 
 
@@ -47,14 +60,14 @@ def signup(request):
 def send_friend_request(request, id):
     # print("firendship", id)
     user = User.objects.get(id=id)
-    print(user.name)
-    print(request.user.name)
+    # print(user.name)
+    # print(request.user.name)
     c1 = FriendshipRequest.objects.filter(created_for=request.user).filter(created_by=user)
     c2 = FriendshipRequest.objects.filter(created_for=user).filter(created_by=request.user)
 
     if (not c1 and not c2):
         friendshipRequest = FriendshipRequest.objects.create(created_for=user, created_by=request.user)
-        return JsonResponse({"message":FriendshipRequestSerializer(friendshipRequest).data})
+        return JsonResponse({"kmessage":FriendshipRequestSerializer(friendshipRequest).data})
     else:
         return JsonResponse({"message" : "Request already sent"})
     
@@ -93,3 +106,47 @@ def handel_friend_request(request, id, status):
     request_user.save()
 
     return JsonResponse({"message":"Friendship Request Updated"})
+
+
+@api_view(['POST'])
+def editProfile(request):
+    user = request.user
+    email = request.data.get('email')
+    if (User.objects.exclude(id=user.id).filter(email = email).exists()):
+        return JsonResponse({"message":"Email already exitst!"})
+
+    form = ProfileForm(request.POST, request.FILES, instance=user)
+
+
+    # print(request.FILES)
+
+    
+    if form.is_valid():
+        form.save()
+        
+    serializer = UserSerializer(user)
+
+    # user.name = request.data.get('name')
+    # user.email = email
+    # user.save()
+
+    return JsonResponse({"message":"success", 'user':serializer.data})
+
+
+@api_view(['POST'])
+def editPassword(request):
+    user = request.user
+
+    form = PasswordChangeForm(data=request.POST, user=user)
+    print(request.data)
+    if form.is_valid():
+        form.save()
+
+        return JsonResponse({"message":"success"}) 
+    
+    else:
+        return JsonResponse({'message':form.errors.as_json()}, safe=False)
+        
+
+    
+     

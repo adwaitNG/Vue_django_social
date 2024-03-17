@@ -29,6 +29,7 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+EMAIL_BACKEND ='django.core.mail.backends.console.EmailBackend'
 
 AUTH_USER_MODEL = 'account.User'
 
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
     'post',
     'chat',
     'search',
+    'notification',
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
@@ -144,6 +146,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL ='media/'
+MEDIA_ROOT = BASE_DIR/ 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

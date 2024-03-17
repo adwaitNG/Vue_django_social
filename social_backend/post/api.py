@@ -1,10 +1,10 @@
 from django.http import JsonResponse
-from .forms import PostForm
+from .forms import PostForm, AttachmentForm
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from account.models import User
 from account.serializer import UserSerializer
-from .models import Post, Like, Comment
-from .serializers import PostSerializer, PostDeatilSeraliser, CommentSerializer
+from .models import Post, Like, Comment, Trends
+from .serializers import PostSerializer, PostDeatilSeraliser, CommentSerializer, TrendsSerialiser
 
 @api_view(['GET'])
 def post_list(request):
@@ -16,6 +16,13 @@ def post_list(request):
 
     posts = Post.objects.filter(created_by__in = list(user_ids)) 
 
+    trend =request.GET.get('trend','')
+
+    print(trend)
+
+    if trend:
+        posts = posts.filter(body__icontains=trend)
+    print(posts)
     serializer = PostSerializer(posts, many=True)
 
     return JsonResponse(serializer.data, safe=False)
@@ -33,14 +40,27 @@ def post_list_profile(request, id):
 
 @api_view(['POST'])
 def post_create(request):
-    form = PostForm(request.data)
+    form = PostForm(request.POST)
+    attachment = None
+    attachment_form = AttachmentForm(request.POST, request.FILES)
+
+    if attachment_form.is_valid():
+        attachment = attachment_form.save(commit=False)
+        attachment.created_by = request.user
+        attachment.save()
 
     if form.is_valid():
         post = form.save(commit=False)
         post.created_by = request.user
         post.save()
 
+        if attachment:
+            post.attachments.add(attachment)
+
+        request.user.post_count = request.user.post_count +1
+        request.user.save()
         serialiser = PostSerializer (post)
+        
         return JsonResponse(serialiser.data, safe=False)
     else:
         return JsonResponse({'Error': "Some error during posting"})                    
@@ -79,4 +99,10 @@ def post_create_comment_request(request, id):
     post.save()
     
     serialiser = CommentSerializer(comment)
+    return JsonResponse(serialiser.data, safe=False)
+
+@api_view(['GET'])
+def get_Trends(request):
+    trends = Trends.objects.all()
+    serialiser = TrendsSerialiser(trends ,many=True)
     return JsonResponse(serialiser.data, safe=False)
