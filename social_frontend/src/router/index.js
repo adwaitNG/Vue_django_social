@@ -11,6 +11,7 @@ import ChatView from "@/views/ChatView.vue";
 import TrendView from "@/views/TrendView.vue";
 import EditProfile from "@/views/EditProfile.vue";
 import EditPassword from "@/views/EditPasswordView.vue";
+import NotificationView from "@/views/NotificationsView.vue"
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -45,9 +46,26 @@ const router = createRouter({
             name: "login",
             component: LoginView,
         },
-        { path: "/profile/:id", name: "profile", component: ProfileView },
-        { path: "/profile/edit", name: "profileEdit", component: EditProfile },
-        { path: "/profile/edit/Password", name: "editPassword", component: EditPassword },
+        { 
+            path: "/profile/:id", 
+            name: "profile", 
+            component: ProfileView 
+        },
+        {
+            path:"/notifications",
+            name:"notifications",
+            component: NotificationView
+        },
+        {   
+            path: "/profile/edit", 
+            name: "profileEdit", 
+            component: EditProfile 
+        },
+        {   
+            path: "/profile/edit/Password", 
+            name: "editPassword", 
+            component: EditPassword 
+        },
         {
             path: "/profile/:id/friends",
             name: "friends",

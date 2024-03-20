@@ -7,6 +7,7 @@ from .forms import SingupForm, ProfileForm
 from .models import User, FriendshipRequest
 from .serializer import UserSerializer, FriendshipRequestSerializer
 
+from notification.utils import create_notification
 @api_view(['GET'])
 def me(request):
     return JsonResponse({
@@ -65,8 +66,11 @@ def send_friend_request(request, id):
     c1 = FriendshipRequest.objects.filter(created_for=request.user).filter(created_by=user)
     c2 = FriendshipRequest.objects.filter(created_for=user).filter(created_by=request.user)
 
+    
+
     if (not c1 and not c2):
         friendshipRequest = FriendshipRequest.objects.create(created_for=user, created_by=request.user)
+        notification = create_notification(request=request, type_of_notification='newFriendRequest', friend_request_id= friendshipRequest.id)
         return JsonResponse({"kmessage":FriendshipRequestSerializer(friendshipRequest).data})
     else:
         return JsonResponse({"message" : "Request already sent"})
@@ -104,6 +108,8 @@ def handel_friend_request(request, id, status):
     request_user = request.user
     request_user.friends_count = request_user.friends_count+1
     request_user.save()
+
+    notification = create_notification(request=request, type_of_notification='acceptedFriendRequest', friend_request_id= friendship_Request.id)
 
     return JsonResponse({"message":"Friendship Request Updated"})
 

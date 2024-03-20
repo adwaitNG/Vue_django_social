@@ -21,7 +21,7 @@ class PostSerializer(serializers.ModelSerializer):
 
 class CommentSerializer(serializers.ModelSerializer):
     created_by = UserSerializer(read_only=True)
-    attachments = PostAttachmentSerializer(read_only = True, many=True)
+    # attachments = PostAttachmentSerializer(read_only = True, many=True)
 
     class Meta:
         model = Comment

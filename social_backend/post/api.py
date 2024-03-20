@@ -5,6 +5,7 @@ from account.models import User
 from account.serializer import UserSerializer
 from .models import Post, Like, Comment, Trends
 from .serializers import PostSerializer, PostDeatilSeraliser, CommentSerializer, TrendsSerialiser
+from notification.utils import create_notification
 
 @api_view(['GET'])
 def post_list(request):
@@ -77,6 +78,9 @@ def post_like_request(request, id):
         post.likes_count = post.likes_count + 1
         post.likes.add(like)
         post.save()
+
+        notification = create_notification(request=request, type_of_notification='postLike', post_id= post.id)
+
         return JsonResponse({"message": "Like created!!"})
     else:
         return JsonResponse({"message":"The post was already liked!"})    
@@ -95,8 +99,9 @@ def post_create_comment_request(request, id):
     post = Post.objects.get(id = id)
     post.comments.add(comment)
     post.comments_count = post.comments_count +1
-
     post.save()
+
+    notification = create_notification(request=request, type_of_notification='postComment', post_id= post.id)
     
     serialiser = CommentSerializer(comment)
     return JsonResponse(serialiser.data, safe=False)
