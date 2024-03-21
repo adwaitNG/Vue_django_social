@@ -16,4 +16,5 @@ urlpatterns = [
     path('friends/<uuid:id>/', api.friends, name='friends'),
     path('friends/<uuid:id>/<str:status>/', api.handel_friend_request, name = 'handel_friend_request'),
     path('activate-account/', views.activateEmail, name="activate_email_view"),
+    path('friends/suggested/', api.friends_suggestions, name="suggested_friends"),
 ]

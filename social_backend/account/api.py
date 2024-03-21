@@ -153,6 +153,9 @@ def editPassword(request):
     else:
         return JsonResponse({'message':form.errors.as_json()}, safe=False)
         
-
+@api_view(['GET'])
+def friends_suggestions(request):
+    serializer = UserSerializer(request.user.people_you_may_know.all(), many= True)
     
+    return JsonResponse(serializer.data, safe=False)
      
