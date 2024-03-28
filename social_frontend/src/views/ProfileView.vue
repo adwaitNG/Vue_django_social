@@ -51,27 +51,7 @@
         <div class="main-center col-span-2 space-y-4" v-if="userStore.user.isAuthenticated">
             <div class="main-center col-span-2 space-y-4">
                 <div class="bg-white border border-gray-200 rounded-lg" v-if="userStore.user.id === user.id">
-                    <form v-on:submit.prevent="submitPost" method="post">
-                        <div class="p-4">
-                            <textarea
-                                v-model="body"
-                                class="p-4 w-full bg-gray-100 rounded-lg"
-                                placeholder="What are you thinking about?"
-                            ></textarea>
-                            <div id="preview" v-if="url">
-                                <img :src="url" class="w-[100] mt-2 rounded-lg" />
-                            </div>
-                        </div>
-
-                        <div class="p-4 border-t border-gray-100 flex justify-between">
-                            <label class="inline-block py-4 px-6 bg-gray-600 text-white rounded-lg">
-                                <input type="file" ref="file" @change="onFileChnage" />Attach image
-                            </label>
-                            <button href="#" class="inline-block py-4 px-6 bg-purple-600 text-white rounded-lg">
-                                Post
-                            </button>
-                        </div>
-                    </form>
+                    <FeedForm v-bind:user="user" v-bind:posts="posts" />
                 </div>
 
                 <div class="p-4 bg-white border border-gray-200 rounded-lg" v-for="post in posts" v-bind:key="post.id">
@@ -101,6 +81,7 @@ input[type="file"] {
 import PeopleYouMayKnow from "@/components/peopleYouMayKnow.vue";
 import Trends from "@/components/Trends.vue";
 import FeedItem from "@/components/FeedItem.vue";
+import FeedForm from "@/components/FeedForm.vue";
 
 import axios from "axios";
 import { useUserStore } from "@/stores/user";
@@ -118,15 +99,18 @@ export default {
         };
     },
 
-    components: { PeopleYouMayKnow, Trends, FeedItem },
+    components: {
+        PeopleYouMayKnow,
+        Trends,
+        FeedItem,
+        FeedForm,
+    },
     data() {
         return {
             posts: [],
             user: {
                 id: null,
             },
-            body: "",
-            url: null,
             can_send_friend_req: null,
         };
     },
@@ -152,12 +136,12 @@ export default {
             axios
                 .get(`api/posts/profile/${this.$route.params.id}/`)
                 .then((response) => {
-                    console.log("data", response.data);
+                    // console.log("data", response.data);
 
                     this.posts = response.data.posts;
                     this.user = response.data.user;
                     this.can_send_friend_req = response.data.can_send_friend_req;
-                    // console.log("http://127.0.0.1:8000" + this.user.avatar);
+                  
                     // console.log(this.user.get_avatar);
                 })
                 .catch((error) => {
@@ -170,26 +154,6 @@ export default {
                 .then((response) => {
                     console.log("data", response.data);
                     this.$router.push("/chat");
-                })
-                .catch((error) => {
-                    console.log("error", error);
-                });
-        },
-        submitPost() {
-            console.log("Submit Form ", this.body);
-            let formData = new FormData();
-            formData.append("image", this.$refs.file.files[0]);
-            formData.append("body", this.body);
-
-            axios
-                .post("api/posts/create/", formData, { headers: { "Content-Type": "multipart/form-data" } })
-                .then((response) => {
-                    console.log("data", response.data);
-
-                    this.posts.unshift(response.data);
-                    this.body = "";
-                    this.url = null;
-                    this.user.post_count += 1;
                 })
                 .catch((error) => {
                     console.log("error", error);

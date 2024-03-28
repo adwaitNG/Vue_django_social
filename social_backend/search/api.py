@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.db.models import Q
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 
 from account.models import User
@@ -10,13 +11,14 @@ from post.serializers import PostSerializer
 def search(request):
     data = request.data
 
+  
     query = data['query']
     # print(query)
 
     users = User.objects.filter(name__icontains=query)
     user_seralizer = UserSerializer(users, many=True)
 
-    posts = Post.objects.filter(body__icontains=query)
+    posts = Post.objects.filter(is_private=False).filter(body__icontains=query)
     post_seralizer = PostSerializer(posts, many=True)
 
     return JsonResponse({"users": user_seralizer.data,

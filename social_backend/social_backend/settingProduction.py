@@ -25,9 +25,9 @@ SECRET_KEY = 'django-insecure-k7%6%@m=eaq(k+3n=x62#id__yb=12mi))zv58qab+_z%8hz0%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['api.social.com']
+WEBSITE_URL = 'http://api.social.com'
 
-WEBSITE_URL = 'http://127.0.0.1:8000'
 
 # Application definition
 EMAIL_BACKEND ='django.core.mail.backends.console.EmailBackend'
@@ -157,9 +157,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
+    "http://social.com",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
+    "http://social.com",
 ]

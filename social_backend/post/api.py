@@ -1,4 +1,5 @@
 from django.http import JsonResponse
+from django.db.models import Q
 from .forms import PostForm, AttachmentForm
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from account.models import User, FriendshipRequest
@@ -15,14 +16,14 @@ def post_list(request):
     for user in request.user.friends.all():
         user_ids.append(user.id)
 
-    posts = Post.objects.filter(created_by__in = list(user_ids)) 
+    posts = Post.objects.filter(is_private=False).filter(created_by__in = list(user_ids)) 
 
     trend =request.GET.get('trend','')
 
-    print(trend)
+    # print(trend)
 
     if trend:
-        posts = posts.filter(body__icontains=trend)
+        posts = posts.filter(is_private=False).filter(body__icontains=trend)
     print(posts)
     serializer = PostSerializer(posts, many=True)
 
@@ -31,8 +32,10 @@ def post_list(request):
 @api_view(['GET'])
 def post_list_profile(request, id):
     user = User.objects.get(pk=id)
-    posts = Post.objects.filter(created_by_id = id)
-
+    if request.user.id == user.id:
+        posts = Post.objects.filter(created_by_id = id)
+    else :
+        posts = Post.objects.filter(is_private=False).filter(created_by_id = id)
     post_serializer = PostSerializer(posts, many=True)
     user_serializer = UserSerializer(user)
 
@@ -100,7 +103,13 @@ def post_like_request(request, id):
 
 @api_view(['GET'])
 def post_details(request, id):
-    post = Post.objects.get(id=id)
+
+    user_ids = [request.user.id]
+
+    for user in request.user.friends.all():
+        user_ids.append(user.id)
+
+    post = Post.objects.filter( Q(created_by__in = list(user_ids)) | Q(is_private=False)).get(id=id)
 
     return JsonResponse({'post': PostDeatilSeraliser(post).data})
 
