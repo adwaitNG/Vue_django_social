@@ -64,11 +64,11 @@ export default {
     },
     methods: {
         submitQuery() {
-            console.log("Query asked", this.query);
+            // console.log("Query asked", this.query);
             axios
                 .post("api/search/", { query: this.query })
                 .then((response) => {
-                    console.log("response", response.data);
+                    // console.log("response", response.data);
                     this.users = response.data.users;
                     this.posts = response.data.posts;
                 })

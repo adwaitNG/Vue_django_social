@@ -55,7 +55,7 @@
                 </div>
 
                 <div class="p-4 bg-white border border-gray-200 rounded-lg" v-for="post in posts" v-bind:key="post.id">
-                    <FeedItem v-bind:post="post" />
+                    <FeedItem v-bind:post="post" v-on:deletePost="deletePost" />
                 </div>
             </div>
         </div>
@@ -141,7 +141,7 @@ export default {
                     this.posts = response.data.posts;
                     this.user = response.data.user;
                     this.can_send_friend_req = response.data.can_send_friend_req;
-                  
+
                     // console.log(this.user.get_avatar);
                 })
                 .catch((error) => {
@@ -158,6 +158,9 @@ export default {
                 .catch((error) => {
                     console.log("error", error);
                 });
+        },
+        deletePost(id) {
+            this.posts = this.posts.filter((post) => post.id !== id);
         },
 
         sendFriendshipRequest() {

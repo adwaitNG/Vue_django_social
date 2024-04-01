@@ -29,7 +29,7 @@ export const useUserStore = defineStore({
 
                 this.refreshToken();
 
-                console.log("User intialized :", this.user);
+                // console.log("User intialized :", this.user);
             }
         },
 
@@ -63,7 +63,7 @@ export const useUserStore = defineStore({
         },
 
         setUserInfo(user) {
-            console.log("setUserInfor", user);
+            // console.log("setUserInfor", user);
 
             this.user.id = user.id;
             this.user.name = user.name;

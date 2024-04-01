@@ -53,7 +53,7 @@ export default {
             axios
                 .get("api/notifications/")
                 .then((response) => {
-                    console.log("data in Notification", response.data);
+                    // console.log("data in Notification", response.data);
                     this.notifications = response.data;
                 })
                 .catch((error) => {

@@ -137,7 +137,7 @@ export default {
             axios
                 .get(`api/chat/${id}/`)
                 .then((response) => {
-                    console.log("data", response.data);
+                    // console.log("data", response.data);
 
                     this.activeConversation = response.data;
                 })

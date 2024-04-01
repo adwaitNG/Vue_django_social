@@ -10,4 +10,6 @@ urlpatterns = [
     path('<uuid:id>/postDetail/', api.post_details, name="post_details"),
     path('<uuid:id>/comment/', api.post_create_comment_request, name="post_comment_request"),
     path('trends/', api.get_Trends, name="get_Trends"),
+    path('delete-post/<uuid:id>/', api.delete_post, name="delete_post"),
+    path('report-post/<uuid:id>/', api.report_post, name="report_post"),
 ]
